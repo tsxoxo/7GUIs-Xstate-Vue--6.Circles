@@ -68,6 +68,9 @@ main {
     stroke: yellow;
     stroke-width: 1;
 }
+.selected {
+    fill: yellow;
+}
 
 #buttons {
     display: flex;
