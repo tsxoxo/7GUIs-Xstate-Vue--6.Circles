@@ -23,7 +23,7 @@ export const circlesMachine = setup({
 
       const newCircle = {
         coordinates: event.coordinates,
-        radius: DEFAULT_RADIUS,
+        radius: 150,
         id: context.lastID + 1
       }
       return {

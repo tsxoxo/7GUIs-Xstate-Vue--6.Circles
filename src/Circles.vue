@@ -5,6 +5,8 @@ import { createBrowserInspector } from '@statelyai/inspect'
 import { computed, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Person } from './types'
+import type { Circle } from './types'
+
 
 const { inspect } = createBrowserInspector({
   // Comment out the line below to start the inspector
@@ -15,12 +17,45 @@ const { snapshot, send } = useMachine(circlesMachine, {
   inspect
 })
 
+const lastClickCoordinates = ref()
+const handleClick = e => {
+  lastClickCoordinates.value = [e.offsetX, e.offsetY]
+  checkIfIntersectsWithAny();
+  send({ type: 'CREATE', coordinates: lastClickCoordinates.value })
+}
+
+
+function getAllIndexes(arr: Array, val: number) {
+  var indexes = [], i;
+  for (i = 0; i < arr.length; i++)
+    if (arr[i] === val)
+      indexes.push(i);
+  return indexes;
+}
+
+function checkIfIntersectsWithAny() {
+  const deltasOfX: number[] = snapshot.value.context.circles.map(circle => Math.abs(circle.coordinates[0] - lastClickCoordinates.value[0]))
+  const smallestX: number = Math.min(...deltasOfX)
+  // check if there are more of this smallest X
+  const allX: number[] = getAllIndexes(deltasOfX, smallestX)
+  // what index do these have?
+
+  const circleWinnersX: Circle[] = allX.map(indexOfCircle => snapshot.value.context.circles[indexOfCircle])
+  const isClickInside: boolean[] = circleWinnersX.map(({ coordinates, radius }) => {
+    const distance = Math.hypot(coordinates[0] - lastClickCoordinates.value[0], coordinates[1] - lastClickCoordinates.value[1])
+    return (distance < radius ? true : false)
+  })
+
+  if (isClickInside.indexOf(true) > -1) { console.log(isClickInside) }
+}
+
+
 </script>
 
 <template>
   <main>
-    <div id="canvas">
-      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+    <div id="canvas" @click="handleClick">
+      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
         <circle v-for="circle in snapshot.context.circles" :cx="circle.coordinates[0]" :cy="circle.coordinates[1]"
           :r="circle.radius" class="circle" />
 
