@@ -60,7 +60,7 @@ const INITIAL_PEOPLE: Person[] = [
   },
 ]
 
-export const crudMachine = setup({
+export const circlesMachine = setup({
   "types": {
     "context": {} as { 'people': Person[], lastID: number },
     "events": {} as { type: 'DELETE', id: number } | { type: 'UPDATE', id: number, surname: string, name: string } | { type: 'CREATE', surname: string, name: string }

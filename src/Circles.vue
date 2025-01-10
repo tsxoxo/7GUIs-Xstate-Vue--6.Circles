@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { useMachine } from '@xstate/vue'
-import { crudMachine } from './crudMachine'
+import { circlesMachine } from './circlesMachine'
 import { createBrowserInspector } from '@statelyai/inspect'
 import { computed, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import type { Person } from './types'
-import { log } from 'xstate'
 
 const { inspect } = createBrowserInspector({
   // Comment out the line below to start the inspector
   autoStart: false
 });
 
-const { snapshot, send } = useMachine(crudMachine, {
+const { snapshot, send } = useMachine(circlesMachine, {
   inspect
 })
 
@@ -72,7 +71,7 @@ watch(selectedPerson, newValue => {
         <!-- <option disabled value=""deselected"">Please select one</option> -->
         <option v-for="(person) in filteredNames.toSorted(sortPersonsBySurnameThenName)" :value="person"> {{
           person.surname }}, {{
-            person.name }} </option>
+    person.name }} </option>
       </select>
       <div id="surname-and-name">
         <label>

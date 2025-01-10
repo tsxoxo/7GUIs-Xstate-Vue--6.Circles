@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import CRUD from './CRUD.vue'
+import Circles from './Circles.vue'
 </script>
 
 <template>
-  <CRUD />
+  <Circles />
 </template>
