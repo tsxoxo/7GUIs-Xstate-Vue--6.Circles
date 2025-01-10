@@ -10,13 +10,13 @@ const INITIAL_CIRCLES: Circle[] = [
     id: 0
   }
 ];
-function getAllIndexes(arr: Array, val: number) {
-  var indexes = [], i;
-  for (i = 0; i < arr.length; i++)
-    if (arr[i] === val)
-      indexes.push(i);
-  return indexes;
-}
+// function getAllIndexes(arr: Array, val: number) {
+//   var indexes = [], i;
+//   for (i = 0; i < arr.length; i++)
+//     if (arr[i] === val)
+//       indexes.push(i);
+//   return indexes;
+// }
 
 function findCircleToSelect(circles: Circle[], clickXY: [number, number]) {
 
@@ -27,30 +27,40 @@ function findCircleToSelect(circles: Circle[], clickXY: [number, number]) {
   circles.forEach(
     (circle, index) => {
       const [x, y] = circle.coordinates;
+
       const deltaX = Math.abs(x - clickXY[0]);
       const deltaY = Math.abs(y - clickXY[1]);
 
+      console.log(`----CIRCLE ${index} \ndeltaX ${deltaX}, deltaY: ${deltaY}`);
       if (deltaX <= smallestDeltaX) {
-        indexesOfCandidates.push(index);
+        indexesOfCandidates[0] = index;
         smallestDeltaX = deltaX;
-        return
+        console.log(`X WINNER!`);
+
       }
+
+
       if (deltaY <= smallestDeltaY) {
-        indexesOfCandidates.push(index);
+        indexesOfCandidates[1] = index
         smallestDeltaY = deltaY;
-        return
+        console.log(`Y WINNER!`);
       }
+      return
+
     }
   )
+  console.log(`indexes of candidates: ${indexesOfCandidates}`)
+
   const arrayOfDistances: number[] = indexesOfCandidates.map((index: number) => {
     const [x, y] = circles[index].coordinates;
     const distance: number = Math.hypot(x - clickXY[0], y - clickXY[1])
     return distance;
   })
-  console.log(arrayOfDistances)
   const smallestDistance: number = Math.min(...arrayOfDistances)
-  const indexOfNearestCandidate = arrayOfDistances.indexOf(smallestDistance)
-  console.log(indexOfNearestCandidate)
+  // const indexOfNearestCandidate = arrayOfDistances.indexOf(smallestDistance)
+  const indexOfNearestCandidate = indexesOfCandidates[arrayOfDistances.indexOf(smallestDistance)]
+
+  console.log(`indexOfNearestCandidate: ${indexOfNearestCandidate}`)
   const isInsideCircle = smallestDistance <= circles[indexOfNearestCandidate].radius
 
   if (isInsideCircle) {
@@ -69,6 +79,8 @@ export const circlesMachine = setup({
       assertEvent(event, 'CLICK');
 
       const indexOfCircleToSelect: number = findCircleToSelect(context.circles, event.coordinates)
+      console.log(`index of circle to select ${indexOfCircleToSelect}`);
+      console.log("\/\/\/\/\/\/\/")
 
       if (indexOfCircleToSelect > -1)
         return {
