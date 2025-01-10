@@ -1,28 +1,3 @@
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 400;
-    src: url(../public/fonts/Inter-Regular.woff2) format("woff2");
-}
-@font-face {
-    font-family: "Inter";
-    font-style: normal;
-    font-weight: 700;
-    src: url(../public/fonts/Inter-Bold.woff2) format("woff2");
-}
-@font-face {
-    font-family: "Roboto Mono";
-    font-style: normal;
-    font-weight: 400;
-    src: url(../public/fonts/RobotoMono-Regular.ttf) format("woff2");
-}
-@font-face {
-    font-family: "Roboto Mono";
-    font-style: normal;
-    font-weight: 500;
-    src: url(../public/fonts/RobotoMono-Medium.ttf) format("woff2");
-}
-
 *,
 *::before,
 *::after {
@@ -35,29 +10,12 @@
     font-family: "Roboto Mono", system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
-    --app: #babeb3;
-    --frame: #d5dcc7;
-    --input-unfocused-bg: #e6e9da;
-    --input-focused-bg: #fcffef;
-    --input-focused-outline: #cc9b39;
-    --input-text: hsla(84 25% 16% 0.8);
-    --display-bg-base: #24281e;
-    --display-bg: linear-gradient(
-            180deg,
-            rgba(60, 82, 31, 0.2) 0%,
-            rgba(91, 118, 58, 0.2) 5.11%,
-            rgba(39, 57, 16, 0.2) 100%
-        ),
-        var(--display-bg-base);
-    --display-text: #9eba5f;
-    --display-scrollbar-thumb: #5b684a;
-    --display-scrollbar-track: #a0aa93;
-    --button-text: var(--input-unfocused-bg);
-    --buttons-disabled: #b6b7b0;
-    --create-button-bg: #659263;
-    --update-button-bg: #6a9eaa;
-    --delete-button-bg: #dc7365;
-    --delete-button-text: #4b4f44;
+    --app: #dfe2d1;
+    --frame: #e5e8df;
+    --dark: #30312a;
+    --circles: #cce867;
+    --button-active: #dced99;
+    --button-inactive: #e5e8df;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -71,7 +29,7 @@ body {
     min-width: 320px;
     min-height: 100vh;
     background: var(--app);
-    color: var(--input-text);
+    color: var(--dark);
 }
 
 .center-children {
@@ -94,104 +52,21 @@ main {
     width: 288px;
     padding: 8px 16px;
     background-color: var(--frame);
-
-    box-shadow: 0px 8px 1px -1px #7a7e6f;
     border-radius: 1px;
 }
 
-#inputs-and-display {
+#canvas {
     display: flex;
     flex-direction: column;
     gap: 8px;
     flex: 1 1 auto;
+    background: var(--dark);
 }
 
-label {
-    font-size: 12px;
-    font-family: Inter, sans-serif;
-    font-weight: 400;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-input {
-    font-family: Inter, sans-serif;
-    font-weight: 700;
-    background: var(--input-unfocused-bg);
-    padding: 8px 12px;
-    border: none;
-
-    box-shadow: inset 1px 1px 0px #c1c7b4, inset 0px -1px 0px #eef2e4;
-}
-
-input:focus {
-    background-color: var(--input-focused-bg);
-    outline: 4px solid var(--input-focused-outline);
-}
-
-#display {
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: transparent;
-    border: none;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    font-family: inherit;
-    font-size: inherit;
-    cursor: inherit;
-    line-height: inherit;
-
-    flex: 1 1 auto;
-    padding: 8px;
-
-    background: var(--display-bg);
-    background-clip: border-box;
-    /* overflow: auto; */
-    /* scrollbar-color: var(--display-scrollbar-thumb)
-        var(--display-scrollbar-track); */
-    box-shadow: inset 0px -2px 8px -3px #12180b;
-    border-radius: 4px;
-}
-
-#display::-webkit-scrollbar-thumb {
-    background-color: var(--display-text);
-    border: 4px solid transparent;
-    border-radius: 4px;
-    background-clip: padding-box;
-}
-
-#display::-webkit-scrollbar {
-    width: 16px;
-}
-#display::-webkit-scrollbar-corner {
-    background-color: var(--display-bg-base);
-    border-radius: 8px;
-}
-
-#display:focus {
-    outline: 6px solid color-mix(in srgb, var(--display-text) 80%, #000);
-}
-
-option {
-    padding: 4px;
-    color: var(--display-text);
-}
-
-option:checked,
-option:focus,
-option:focus-visible,
-option:active {
-    /* background-color: var(--display-text); */
-    background: linear-gradient(var(--display-text), var(--display-text));
-    color: rgb(16, 16, 16) !important;
-}
-
-#surname-and-name {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.circle {
+    fill: none;
+    stroke: yellow;
+    stroke-width: 1;
 }
 
 #buttons {
@@ -199,76 +74,15 @@ option:active {
     justify-content: space-between;
 }
 
-#create-and-update {
-    display: flex;
-    gap: 6px;
-}
-
 button {
-    /* background: var(--create-button-bg); */
     font-family: inherit;
     font-weight: 500;
     padding: 10px 12px;
-    color: var(--button-text);
-    border: none;
-    box-shadow: 0px 2px 0px #9d9f99;
+    border: 2px solid var(--dark);
     border-radius: 2px;
-}
-
-button:focus {
-    outline: 4px solid var(--input-focused-outline);
+    background-color: var(--button-active);
 }
 
 button:disabled {
-    background-color: var(--buttons-disabled) !important;
+    background-color: var(--button-inactive) !important;
 }
-
-#button-create {
-    background-color: var(--create-button-bg);
-}
-#button-create:focus {
-    outline: 4px solid color-mix(in srgb, var(--create-button-bg) 80%, #000);
-}
-#button-update {
-    background-color: var(--update-button-bg);
-}
-#button-update:focus {
-    outline: 4px solid color-mix(in srgb, var(--update-button-bg) 80%, #000);
-}
-#button-delete {
-    background-color: var(--delete-button-bg);
-    color: var(--delete-button-text);
-}
-#button-delete:focus {
-    outline: 4px solid color-mix(in srgb, var(--delete-button-bg) 75%, #000);
-}
-/* Initial, grid-based design as shown on screenshot in 7GUIs instructions */
-/* main {
-  padding: 32px;
-  display: grid;
-  height: 360px;
-  grid-template-rows: min-content 1fr min-content;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "fp ."
-    "nl nef"
-    "b b"
-} */
-
-/* #filter-prefix {
-  grid-area: fp;
-}
-
-#names-list {
-  grid-area: nl;
-}
-
-#names-edit-fields {
-  grid-area: nef;
-}
-
-#buttons {
-  grid-area: b;
-  display: flex;
-  gap: 32px;
-} */

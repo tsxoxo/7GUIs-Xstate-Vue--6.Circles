@@ -1,5 +1,5 @@
-export interface Person {
-    name: string;
-    surname: string;
+export interface Circle {
+    coordinates: [number, number],
+    radius: number,
     id: number;
 }

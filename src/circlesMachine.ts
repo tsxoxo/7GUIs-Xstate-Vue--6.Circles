@@ -1,81 +1,33 @@
 
 import { setup, assign, assertEvent } from 'xstate'
-import type { Person } from './types'
+import type { Circle } from './types'
 
-const INITIAL_PEOPLE: Person[] = [
+const DEFAULT_RADIUS = 50;
+const INITIAL_CIRCLES: Circle[] = [
   {
-    name: "Joe",
-    surname: "Shmoe",
-    id: 0,
-  },
-  {
-    name: "Linda",
-    surname: "Shminda",
-    id: 1,
-  },
-  {
-    name: "Brett",
-    surname: "Shmett",
-    id: 2,
-  },
-  {
-    name: "Eve",
-    surname: "Shmeve",
-    id: 3,
-  },
-  {
-    name: "Annette",
-    surname: "Emeterius",
-    id: 4,
-  },
-  {
-    name: "Fritiof",
-    surname: "Hiacynta",
-    id: 5,
-  },
-  {
-    name: "Paavo",
-    surname: "Hampus",
-    id: 6,
-  },
-  {
-    name: "Phuntso",
-    surname: "Von Ingersleben",
-    id: 7,
-  },
-  {
-    name: "Paul",
-    surname: "Vijaya",
-    id: 8,
-  },
-  {
-    name: "Amit",
-    surname: "Kranz",
-    id: 9,
-  },
-  {
-    name: "Henrik",
-    surname: "Blakely",
-    id: 10,
-  },
-]
+    coordinates: [100, 100],
+    radius: DEFAULT_RADIUS,
+    id: 0
+  }
+];
+
 
 export const circlesMachine = setup({
   "types": {
-    "context": {} as { 'people': Person[], lastID: number },
-    "events": {} as { type: 'DELETE', id: number } | { type: 'UPDATE', id: number, surname: string, name: string } | { type: 'CREATE', surname: string, name: string }
+    "context": {} as { 'circles': Circle[], lastID: number },
+    "events": {} as { type: 'CREATE', coordinates: [number, number] } | { type: 'UPDATE', id: number, radius: number }
   },
   "actions": {
     "create": assign(({ context, event }) => {
       assertEvent(event, 'CREATE');
 
-      const newPerson = {
-        surname: event.surname,
-        name: event.name,
+      const newCircle = {
+        coordinates: event.coordinates,
+        radius: DEFAULT_RADIUS,
         id: context.lastID + 1
       }
       return {
-        people: context.people.toSpliced(context.people.length, 0, newPerson),
+        circles: context.circles.toSpliced(context.circles.length, 0, newCircle),
         lastID: context.lastID + 1
       }
     }
@@ -83,32 +35,22 @@ export const circlesMachine = setup({
     "update": assign(({ context, event }) => {
       assertEvent(event, 'UPDATE');
 
-      const updatedPerson = {
-        surname: event.surname,
-        name: event.name,
+      const updatedCircle = {
         id: event.id
       }
       return {
-        people: context.people.toSpliced(context.people.findIndex((el: Person) => el.id === event.id), 1, updatedPerson),
+        // people: context.people.toSpliced(context.people.findIndex((el: Person) => el.id === event.id), 1, updatedPerson),
       }
     }
     ),
-    "delete": assign(({ context, event }) => {
-      assertEvent(event, 'DELETE');
-
-      return {
-        people: context.people.toSpliced(context.people.findIndex((el: Person) => el.id === event.id), 1),
-      }
-    }
-    )
   }
 })
   .createMachine({
     "context": {
-      "people": INITIAL_PEOPLE,
-      "lastID": INITIAL_PEOPLE.length - 1
+      "circles": INITIAL_CIRCLES,
+      "lastID": INITIAL_CIRCLES.length - 1
     },
-    "id": "CRUD",
+    "id": "Circles",
     "initial": "ready",
     "states": {
       "ready": {
