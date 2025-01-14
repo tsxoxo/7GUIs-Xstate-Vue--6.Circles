@@ -17,7 +17,7 @@
     --hue: #0f152d;
     --circles: var(--hue);
     --button-active: var(--canvas);
-    --button-inactive: #e5e8df;
+    --button-inactive: #aea1a1;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
