@@ -2,6 +2,8 @@
 import { useMachine } from '@xstate/vue'
 import { circlesMachine } from './circlesMachine'
 import { createBrowserInspector } from '@statelyai/inspect'
+import { watch } from 'vue';
+
 
 const { inspect } = createBrowserInspector({
   // Comment out the line below to start the inspector
@@ -17,7 +19,8 @@ const handleClick = (e: Event) => {
   // lastClickCoordinates.value = {x: e.offsetX, y: e.offsetY}
   send({ type: 'leftClickOnCanvas', coordinates: { x: e.offsetX, y: e.offsetY } })
 }
-
+watch(() => snapshot.value.context, (context) => console.log(context)
+)
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const handleClick = (e: Event) => {
         Undo
       </button>
       <button @click="send({ type: 'redo', })"
-        :disabled="snapshot.context.currentPosInStateHistory === snapshot.context.stateHistory.length - 1">
+        :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
         Redo
       </button>
     </div>
