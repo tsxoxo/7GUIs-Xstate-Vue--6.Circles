@@ -17,6 +17,7 @@ const handleClick = (e: Event) => {
   // lastClickCoordinates.value = {x: e.offsetX, y: e.offsetY}
   send({ type: 'leftClickOnCanvas', coordinates: { x: e.offsetX, y: e.offsetY } })
 }
+
 </script>
 
 <template>
@@ -32,10 +33,11 @@ const handleClick = (e: Event) => {
     </div>
 
     <div id="buttons">
-      <button @click="send({ type: 'undo', })">
+      <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
         Undo
       </button>
-      <button @click="send({ type: 'redo', })">
+      <button @click="send({ type: 'redo', })"
+        :disabled="snapshot.context.currentPosInStateHistory === snapshot.context.stateHistory.length - 1">
         Redo
       </button>
     </div>
