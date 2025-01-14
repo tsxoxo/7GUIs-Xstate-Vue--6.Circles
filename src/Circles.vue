@@ -15,7 +15,7 @@ const { snapshot, send } = useMachine(circlesMachine, {
 })
 
 // const lastClickCoordinates = ref({x: 0, y: 0})
-const handleClick = (e: Event) => {
+const handleClick = (e: MouseEvent) => {
   // lastClickCoordinates.value = {x: e.offsetX, y: e.offsetY}
   send({ type: 'leftClickOnCanvas', coordinates: { x: e.offsetX, y: e.offsetY } })
 }
