@@ -3,23 +3,25 @@ import { setup, assign, assertEvent } from 'xstate'
 import type { Circle, State } from './types'
 
 const DEFAULT_RADIUS = 100;
-const INITIAL_CIRCLES: Circle[] = [
-  {
-    coordinates: { x: 100, y: 100 },
-    radius: DEFAULT_RADIUS,
-    id: 0
-  },
-  {
-    coordinates: { x: 200, y: 400 },
-    radius: DEFAULT_RADIUS / 2,
-    id: 0
-  },
-  {
-    coordinates: { x: 200, y: 200 },
-    radius: DEFAULT_RADIUS / 6,
-    id: 0
-  }
-];
+// const INITIAL_CIRCLES: Circle[] = [
+//   {
+//     coordinates: { x: 100, y: 100 },
+//     radius: DEFAULT_RADIUS,
+//     id: 0
+//   },
+//   {
+//     coordinates: { x: 200, y: 400 },
+//     radius: DEFAULT_RADIUS / 2,
+//     id: 0
+//   },
+//   {
+//     coordinates: { x: 200, y: 200 },
+//     radius: DEFAULT_RADIUS / 6,
+//     id: 0
+//   }
+// ];
+
+const INITIAL_CIRCLES = [] as Circle[]
 
 function findClosestCircleThatIntersects(circles: Circle[], coordinates: { x: number, y: number }) {
 
@@ -48,7 +50,7 @@ function findClosestCircleThatIntersects(circles: Circle[], coordinates: { x: nu
 
 export const circlesMachine = setup({
   "types": {
-    "context": {} as { 'states': State[], 'stateHistory': number[], 'indexOfSelectedCircle': number, 'lastID': number, 'currentPosInStateHistory': number },
+    "context": {} as { 'states': State[], 'stateHistory': number[], 'indexOfSelectedCircle': number, 'currentPosInStateHistory': number },
     "events": {} as { type: 'undo', } | { type: 'redo', } | { type: 'leftClickOnCanvas', coordinates: { x: number, y: number } } | { type: 'changeCircle', } | { type: 'confirm', } | { type: 'cancel', } | { type: 'changeRadius', newRadius: number }
   },
   "actions": {
@@ -65,7 +67,7 @@ export const circlesMachine = setup({
         const newCircle = {
           coordinates: event.coordinates,
           radius: DEFAULT_RADIUS,
-          id: context.lastID + 1
+          id: currentStateCopy.length - 1
         }
         const newState = [...currentStateCopy, newCircle]
 
@@ -91,19 +93,27 @@ export const circlesMachine = setup({
     "undo": assign(({ context, event }) => {
       assertEvent(event, 'undo');
 
+      const changesToContext: Partial<typeof context> = {}
+
       if (context.currentPosInStateHistory > 0) {
-        return { currentPosInStateHistory: context.currentPosInStateHistory - 1 }
+        changesToContext.currentPosInStateHistory = context.currentPosInStateHistory - 1
+        changesToContext.stateHistory = [...context.stateHistory, context.stateHistory[changesToContext.currentPosInStateHistory!]]
       }
 
+      return changesToContext
     }
     ),
     "redo": assign(({ context, event }) => {
       assertEvent(event, 'redo');
 
+      const changesToContext: Partial<typeof context> = {}
+
       if (context.currentPosInStateHistory < context.stateHistory.length - 1) {
-        return { currentPosInStateHistory: context.currentPosInStateHistory + 1 }
+        changesToContext.currentPosInStateHistory = context.currentPosInStateHistory + 1
+        changesToContext.stateHistory = [...context.stateHistory, context.stateHistory[changesToContext.currentPosInStateHistory!]]
       }
 
+      return changesToContext
     }
     ),
     "removeTempState": assign(({ context }) => {
@@ -140,7 +150,6 @@ export const circlesMachine = setup({
       ],
       "currentPosInStateHistory": 0,
       'indexOfSelectedCircle': -1,
-      "lastID": INITIAL_CIRCLES.length - 1
     },
     "id": "Circles",
     "initial": "ready",
