@@ -3,3 +3,5 @@ export interface Circle {
     radius: number,
     id: number;
 }
+
+export type State = Circle[]

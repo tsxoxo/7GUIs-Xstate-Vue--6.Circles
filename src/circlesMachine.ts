@@ -1,6 +1,6 @@
 
 import { setup, assign, assertEvent } from 'xstate'
-import type { Circle } from './types'
+import type { Circle, State } from './types'
 
 const DEFAULT_RADIUS = 100;
 const INITIAL_CIRCLES: Circle[] = [
@@ -21,7 +21,7 @@ const INITIAL_CIRCLES: Circle[] = [
   }
 ];
 
-function findCircleToSelect(circles: Circle[], coordinates: { x: number, y: number }) {
+function findClosestCircleThatIntersects(circles: Circle[], coordinates: { x: number, y: number }) {
 
   let bestCandidateSoFar = { index: -1, distance: 999999 };
 
@@ -40,7 +40,6 @@ function findCircleToSelect(circles: Circle[], coordinates: { x: number, y: numb
           distance
         }
       }
-
     }
   }
 
@@ -49,49 +48,97 @@ function findCircleToSelect(circles: Circle[], coordinates: { x: number, y: numb
 
 export const circlesMachine = setup({
   "types": {
-    "context": {} as { 'circles': Circle[], 'indexOfSelectedCircle': number, 'lastID': number },
-    "events": {} as { type: 'CLICK', coordinates: { x: number, y: number } } | { type: 'UPDATE', id: number, radius: number }
+    "context": {} as { 'states': State[], 'stateHistory': number[], 'indexOfSelectedCircle': number, 'lastID': number, 'currentPosInStateHistory': number },
+    "events": {} as { type: 'undo', } | { type: 'redo', } | { type: 'leftClickOnCanvas', coordinates: { x: number, y: number } } | { type: 'changeCircle', } | { type: 'confirm', } | { type: 'cancel', } | { type: 'changeRadius', newRadius: number }
   },
   "actions": {
-    "handleClick": assign(({ context, event }) => {
-      assertEvent(event, 'CLICK');
+    "handleLeftClickOnCanvas": assign(({ context, event }) => {
+      assertEvent(event, 'leftClickOnCanvas');
 
-      const indexOfCircleToSelect: number = findCircleToSelect(context.circles, event.coordinates)
+      const changesToContext: Partial<typeof context> = {}
+      const currentStateCopy: State = context.states[context.stateHistory[context.currentPosInStateHistory]].slice()
+      const indexOfCircleToSelect: number = findClosestCircleThatIntersects(currentStateCopy, event.coordinates)
 
-      if (indexOfCircleToSelect > -1)
-        return {
-          indexOfSelectedCircle: indexOfCircleToSelect,
-        }
-      else {
+      changesToContext.indexOfSelectedCircle = indexOfCircleToSelect
+
+      if (indexOfCircleToSelect === -1) {
         const newCircle = {
           coordinates: event.coordinates,
           radius: DEFAULT_RADIUS,
           id: context.lastID + 1
         }
-        return {
-          circles: context.circles.toSpliced(context.circles.length, 0, newCircle),
-          indexOfSelectedCircle: -1,
-          lastID: context.lastID + 1
-        }
-      }
-    }
-    ),
-    "update": assign(({ context, event }) => {
-      assertEvent(event, 'UPDATE');
+        const newState = [...currentStateCopy, newCircle]
 
-      const updatedCircle = {
-        id: event.id
+        changesToContext.states = [...context.states, newState]
+        changesToContext.stateHistory = [...context.stateHistory, changesToContext.states.length - 1]
+        changesToContext.currentPosInStateHistory = changesToContext.stateHistory.length - 1
       }
-      return {
-        // people: context.people.toSpliced(context.people.findIndex((el: Person) => el.id === event.id), 1, updatedPerson),
-      }
+
+      return { ...changesToContext }
     }
     ),
+    "createTempState": assign(({ context }) => {
+      const changesToContext: Partial<typeof context> = {}
+      const currentStateCopy: State = context.states[context.stateHistory[context.currentPosInStateHistory]].slice()
+
+      changesToContext.states = [...context.states, currentStateCopy]
+      changesToContext.stateHistory = [...context.stateHistory, changesToContext.states.length - 1]
+      changesToContext.currentPosInStateHistory = changesToContext.stateHistory.length - 1
+
+      return { ...changesToContext }
+    }
+    ),
+    "undo": assign(({ context, event }) => {
+      assertEvent(event, 'undo');
+
+      if (context.currentPosInStateHistory > 0) {
+        return { currentPosInStateHistory: context.currentPosInStateHistory - 1 }
+      }
+
+    }
+    ),
+    "redo": assign(({ context, event }) => {
+      assertEvent(event, 'redo');
+
+      if (context.currentPosInStateHistory < context.stateHistory.length - 1) {
+        return { currentPosInStateHistory: context.currentPosInStateHistory + 1 }
+      }
+
+    }
+    ),
+    "removeTempState": assign(({ context }) => {
+      const changesToContext: Partial<typeof context> = {}
+
+      const statesWithoutTempState: State[] = context.states.toSpliced(-1, 1)
+      const stateHistoryWithoutTempStateIndex = context.stateHistory.toSpliced(-1, 1)
+
+      changesToContext.states = statesWithoutTempState
+      changesToContext.stateHistory = stateHistoryWithoutTempStateIndex
+      changesToContext.currentPosInStateHistory = changesToContext.stateHistory.length - 1
+
+      return { ...changesToContext }
+    }),
+    "changeRadius": assign(({ context, event }) => {
+      assertEvent(event, 'changeRadius');
+
+      const changesToContext: Partial<typeof context> = {}
+      const currentStateCopy: State = context.states[context.stateHistory[context.currentPosInStateHistory]].slice()
+
+      currentStateCopy[context.indexOfSelectedCircle].radius = event.newRadius
+      changesToContext.states = context.states.toSpliced(context.stateHistory[context.currentPosInStateHistory], 1, currentStateCopy)
+
+      return { ...changesToContext }
+    }
+    )
   }
 })
   .createMachine({
     "context": {
-      "circles": INITIAL_CIRCLES,
+      "states": [INITIAL_CIRCLES],
+      "stateHistory": [
+        0
+      ],
+      "currentPosInStateHistory": 0,
       'indexOfSelectedCircle': -1,
       "lastID": INITIAL_CIRCLES.length - 1
     },
@@ -100,21 +147,50 @@ export const circlesMachine = setup({
     "states": {
       "ready": {
         "on": {
-          "CLICK": {
-            "target": "ready",
+          "changeCircle": {
+            "target": "changingCircle",
             "actions": {
-              "type": "handleClick"
+              "type": "createTempState"
             }
           },
-          "UPDATE": {
+          "leftClickOnCanvas": {
             "target": "ready",
             "actions": {
-              "type": "update",
-              "params": {
-                "id": "number"
-              }
+              "type": "handleLeftClickOnCanvas"
             }
           },
+          "undo": {
+            "target": "ready",
+            "actions": {
+              "type": "undo"
+            }
+          },
+          "redo": {
+            "target": "ready",
+            "actions": {
+              "type": "redo"
+            }
+          }
+        }
+      },
+      "changingCircle": {
+        "on": {
+          "confirm": {
+            "target": "ready"
+          },
+          "cancel": {
+            "target": "ready",
+            "actions": {
+              "type": "removeTempState"
+            }
+          },
+          "changeRadius": {
+            "target": "changingCircle",
+            "actions": {
+              "type": "changeRadius"
+            },
+            "description": "params: newRadius: number"
+          }
         }
       }
     }
