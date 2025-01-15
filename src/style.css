@@ -48,7 +48,7 @@ body {
 main {
     display: flex;
     flex-direction: column;
-    justify-content: safe;
+    gap: 0px;
     height: 517px;
     width: 288px;
     padding: 0px;
@@ -68,37 +68,44 @@ main {
 .selected {
     fill: var(--circle-fill);
 }
+#menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px 16px 16px;
+    background-color: var(--menu);
+    border-top: 1px dashed var(--lines-and-borders);
+}
 #radius-slider {
     width: 100%;
 }
 #buttons {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    gap: 16px;
     /* padding: 8px 24px; */
     /* flex:1 0 0; */
-    gap: 0px;
-    border-top: 1px dashed var(--lines-and-borders);
 }
 
 button {
     font-family: monospace;
     letter-spacing: 0.1rem;
-    font-size: 22px;
-    font-weight: 600;
-
-    /* outline: 1px solid color-mix(in srgb, var(--hue), #fff 90%); */
-    /* outline-style: inset; */
-    /* outline-offset: -6px; */
-    /* padding: 10px 12px; */
-    border: 2px solid var(--lines-and-borders);
-    /* border-top-color: #5e64de;
-    border-left-color: #434aca;
-    border-right-color: #351e9a; */
-    /* border-radius: 4px; */
-    /* color: var(--button-active); */
-    background-color: var(--button-active-bg);
+    font-size: 24px;
+    font-weight: 400;
+    height: 48px;
     width: 100%;
-    height: 64px;
+    padding-inline: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border: 3px solid var(--lines-and-borders);
+    background-color: var(--button-active-bg);
+    transition-duration: 100ms;
+}
+button:not(:disabled) {
+    box-shadow: 2px 4px 0px var(--lines-and-borders);
+    transform: translate(-2px, -4px);
 }
 
 button:disabled {
@@ -107,4 +114,7 @@ button:disabled {
 }
 
 button:active {
+    box-shadow: none;
+    transform: translate(0px, 0px);
+    transition: all;
 }
