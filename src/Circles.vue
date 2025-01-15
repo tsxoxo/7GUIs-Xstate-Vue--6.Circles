@@ -41,7 +41,7 @@ const handleClick = (e: MouseEvent) => {
           const target = e.target as HTMLInputElement
           send({ type: 'changeRadius', newRadius: Number(target.value) })
         }" type="range" id="radius-slider" name="radius-slider" min="1" max="400"
-          :value="circles[snapshot.context.indexOfSelectedCircle]?.radius || 0" step="1"
+          :value="circles[snapshot.context.indexOfSelectedCircle]?.radius" step="1"
           :disabled="snapshot.context.indexOfSelectedCircle === -1" />
       </div>
       <div id="buttons">
@@ -64,7 +64,7 @@ const handleClick = (e: MouseEvent) => {
           </button>
         </template>
         <template v-else-if="snapshot.value === 'changingCircle'">
-          <button @click="send({ type: 'cancel', })"><svg style='width:24px; height:24px' viewBox="0 0 16 16"
+          <button @click="send({ type: 'cancel', })"><svg style='width:22px; height:22px' viewBox="0 0 16 16"
               fill="none" xmlns="http://www.w3.org/2000/svg">
               <line x1="3.33351" y1="2.85985" x2="12.6673" y2="12.1937" stroke-width="1.33" />
               <line y1="-0.665" x2="13.2" y2="-0.665"
@@ -72,7 +72,7 @@ const handleClick = (e: MouseEvent) => {
             </svg>
 
             Cancel</button>
-          <button @click="send({ type: 'confirm', })"><svg style='width:28px; height:28px' viewBox="0 0 24 24"
+          <button @click="send({ type: 'confirm', })"><svg style='width:24px; height:24px' viewBox="0 0 24 24"
               fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M5 11L11 17L21 7" />
             </svg>
