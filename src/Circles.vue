@@ -46,6 +46,7 @@ const handleClick = (e: MouseEvent) => {
           :disabled="snapshot.context.indexOfSelectedCircle === -1" />
       </div>
       <div id="buttons">
+        <template v-if="snapshot.value === 'ready'">
         <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
           Undo
         </button>
@@ -53,6 +54,11 @@ const handleClick = (e: MouseEvent) => {
           :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
           Redo
         </button>
+        </template>
+        <template v-else-if="snapshot.value === 'changingCircle'">
+          <button @click="send({ type: 'cancel', })">Cancel</button>
+          <button @click="send({ type: 'confirm', })">Confirm</button>
+        </template>
       </div>
     </div>
   </main>
