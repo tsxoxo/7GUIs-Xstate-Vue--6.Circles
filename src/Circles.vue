@@ -26,7 +26,6 @@ const handleClick = (e: MouseEvent) => {
 
 <template>
   <main>
-    <button @click="send({ type: 'changeCircle' })">change circle</button>
     <div id="canvas" @click="handleClick">
       <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
         <circle v-for="(circle, index) in circles" :cx="circle.coordinates.x" :cy="circle.coordinates.y"
@@ -47,13 +46,13 @@ const handleClick = (e: MouseEvent) => {
       </div>
       <div id="buttons">
         <template v-if="snapshot.value === 'ready'">
-        <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
-          Undo
-        </button>
-        <button @click="send({ type: 'redo', })"
-          :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
-          Redo
-        </button>
+          <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
+            Undo
+          </button>
+          <button @click="send({ type: 'redo', })"
+            :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
+            Redo
+          </button>
         </template>
         <template v-else-if="snapshot.value === 'changingCircle'">
           <button @click="send({ type: 'cancel', })">Cancel</button>
