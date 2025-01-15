@@ -25,6 +25,9 @@
     --text: var(--primary-900);
     --inactive-stuff: var(--primary-700);
 
+    --button-x-offset: 2px;
+    --button-y-offset: 4px;
+
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -113,34 +116,38 @@ input[type="range"]:disabled::-webkit-slider-thumb {
 
 #buttons {
     display: flex;
-    gap: 16px;
+    gap: 8px;
 }
 
 button {
     font-family: monospace;
-    /* letter-spacing: 0.1rem; */
-    font-size: 22px;
+    letter-spacing: -0rem;
+    font-size: 18px;
     font-weight: 400;
     height: 48px;
-    width: 100%;
-    padding-inline: 12px;
+    width: 50%;
+    /* padding-inline: 8px 12px; */
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     border: 3px solid var(--lines-and-borders);
     background-color: var(--button-active-bg);
     transition-duration: 100ms;
     & svg {
         stroke: var(--primary-900);
         stroke-width: 2px;
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
     }
 }
 button:not(:disabled) {
-    box-shadow: 2px 4px 0px var(--lines-and-borders);
-    transform: translate(-2px, -4px);
+    box-shadow: var(--button-x-offset) var(--button-y-offset) 0px
+        var(--lines-and-borders);
+    transform: translate(
+        calc(0px - var(--button-x-offset)),
+        calc(0px - var(--button-y-offset))
+    );
 }
 
 button:disabled {
@@ -156,5 +163,5 @@ button:disabled {
 button:active {
     box-shadow: none;
     transform: translate(0px, 0px);
-    transition: all;
+    transition: "transform";
 }
