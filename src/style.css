@@ -74,13 +74,15 @@ main {
     gap: 12px;
     padding: 12px 16px 16px 16px;
     background-color: var(--menu);
-    border-top: 1px dashed var(--lines-and-borders);
+    border-top: 1px solid var(--lines-and-borders);
 }
+
 #slider-div {
     height: 36px;
     display: flex;
     align-items: center;
 }
+
 input[type="range"] {
     appearance: none;
     position: relative;
@@ -88,6 +90,7 @@ input[type="range"] {
     height: 4px;
     background: var(--primary-900);
 }
+
 input[type="range"]::-webkit-slider-thumb {
     appearance: none;
     width: 18px;
@@ -95,25 +98,25 @@ input[type="range"]::-webkit-slider-thumb {
     background-color: var(--primary-100);
     border: 3px solid var(--primary-900);
 }
+
 input[type="range"]:disabled {
     height: 1px;
 }
+
 input[type="range"]:disabled::-webkit-slider-thumb {
     background-color: var(--menu);
     border: 1px solid var(--primary-900);
 }
+
 #buttons {
     display: flex;
-    /* justify-content: space-between; */
     gap: 16px;
-    /* padding: 8px 24px; */
-    /* flex:1 0 0; */
 }
 
 button {
     font-family: monospace;
-    letter-spacing: 0.1rem;
-    font-size: 24px;
+    /* letter-spacing: 0.1rem; */
+    font-size: 22px;
     font-weight: 400;
     height: 48px;
     width: 100%;
@@ -126,6 +129,7 @@ button {
     background-color: var(--button-active-bg);
     transition-duration: 100ms;
 }
+
 button:not(:disabled) {
     box-shadow: 2px 4px 0px var(--lines-and-borders);
     transform: translate(-2px, -4px);
