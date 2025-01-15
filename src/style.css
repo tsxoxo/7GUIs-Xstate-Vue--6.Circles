@@ -78,6 +78,12 @@ main {
     fill: var(--circles);
 }
 
+#slider-div {
+}
+
+#radius-slider {
+    width: 100%;
+}
 #buttons {
     display: flex;
     justify-content: space-between;

@@ -2,7 +2,7 @@
 import { useMachine } from '@xstate/vue'
 import { circlesMachine } from './circlesMachine'
 import { createBrowserInspector } from '@statelyai/inspect'
-import { watch } from 'vue';
+import { computed } from 'vue';
 
 
 const { inspect } = createBrowserInspector({
@@ -13,36 +13,47 @@ const { inspect } = createBrowserInspector({
 const { snapshot, send } = useMachine(circlesMachine, {
   inspect
 })
+const circles = computed(() => snapshot.value.context.states[snapshot.value.context.stateHistory[snapshot.value.context.currentPosInStateHistory]])
 
 // const lastClickCoordinates = ref({x: 0, y: 0})
 const handleClick = (e: MouseEvent) => {
   // lastClickCoordinates.value = {x: e.offsetX, y: e.offsetY}
   send({ type: 'leftClickOnCanvas', coordinates: { x: e.offsetX, y: e.offsetY } })
 }
-watch(() => snapshot.value.context, (context) => console.log(context)
-)
+// watch(() => snapshot.value, (snapshot) => console.log(snapshot.value)
+// )
 </script>
 
 <template>
   <main>
+    <button @click="send({ type: 'changeCircle' })">change circle</button>
     <div id="canvas" @click="handleClick">
       <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-        <circle
-          v-for="(circle, index) in snapshot.context.states[snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory]]"
-          :cx="circle.coordinates.x" :cy="circle.coordinates.y" :r="circle.radius" class="circle"
+        <circle v-for="(circle, index) in circles" :cx="circle.coordinates.x" :cy="circle.coordinates.y"
+          :r="circle.radius" class="circle"
           :class="[index === snapshot.context.indexOfSelectedCircle ? 'selected' : '']" :key="circle.id" />
 
       </svg>
     </div>
 
-    <div id="buttons">
-      <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
-        Undo
-      </button>
-      <button @click="send({ type: 'redo', })"
-        :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
-        Redo
-      </button>
+    <div id="menu">
+      <div id="slider-div">
+        <input @input="(e: Event) => {
+          const target = e.target as HTMLInputElement
+          send({ type: 'changeRadius', newRadius: Number(target.value) })
+        }" type="range" id="radius-slider" name="radius-slider" min="1" max="1000"
+          :value="circles[snapshot.context.indexOfSelectedCircle]?.radius || 0" step="1"
+          :disabled="snapshot.context.indexOfSelectedCircle === -1" />
+      </div>
+      <div id="buttons">
+        <button @click="send({ type: 'undo', })" :disabled="snapshot.context.currentPosInStateHistory === 0">
+          Undo
+        </button>
+        <button @click="send({ type: 'redo', })"
+          :disabled="snapshot.context.stateHistory[snapshot.context.currentPosInStateHistory] === snapshot.context.states.length - 1">
+          Redo
+        </button>
+      </div>
     </div>
   </main>
 </template>

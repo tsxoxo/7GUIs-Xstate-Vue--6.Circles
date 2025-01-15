@@ -1,4 +1,3 @@
-
 import { setup, assign, assertEvent } from 'xstate'
 import type { Circle, State } from './types'
 
@@ -48,13 +47,19 @@ function findClosestCircleThatIntersects(circles: Circle[], coordinates: { x: nu
   return bestCandidateSoFar.index;
 }
 
+interface Context { 'states': State[], 'stateHistory': number[], 'indexOfSelectedCircle': number, 'currentPosInStateHistory': number }
+
 export const circlesMachine = setup({
   "types": {
-    "context": {} as { 'states': State[], 'stateHistory': number[], 'indexOfSelectedCircle': number, 'currentPosInStateHistory': number },
+    "context": {} as Context,
     "events": {} as { type: 'undo', } | { type: 'redo', } | { type: 'leftClickOnCanvas', coordinates: { x: number, y: number } } | { type: 'changeCircle', } | { type: 'confirm', } | { type: 'cancel', } | { type: 'changeRadius', newRadius: number }
   },
+  "guards": {
+    "checkIfThereIsSelected": ({ context }) =>
+      context.indexOfSelectedCircle > -1
+  },
   "actions": {
-    "handleLeftClickOnCanvas": assign(({ context, event }) => {
+    "selectOrCreateCircle": assign(({ context, event }) => {
       assertEvent(event, 'leftClickOnCanvas');
 
       const changesToContext: Partial<typeof context> = {}
@@ -155,17 +160,15 @@ export const circlesMachine = setup({
     "initial": "ready",
     "states": {
       "ready": {
+        always: {
+          guard: { type: 'checkIfThereIsSelected' },
+          "target": "changingCircle",
+        },
         "on": {
-          "changeCircle": {
-            "target": "changingCircle",
-            "actions": {
-              "type": "createTempState"
-            }
-          },
           "leftClickOnCanvas": {
             "target": "ready",
             "actions": {
-              "type": "handleLeftClickOnCanvas"
+              "type": "selectOrCreateCircle"
             }
           },
           "undo": {
@@ -183,7 +186,17 @@ export const circlesMachine = setup({
         }
       },
       "changingCircle": {
-        "on": {
+        entry: [{
+          "type": "createTempState"
+        }],
+        "on":
+        {
+          "leftClickOnCanvas": {
+            "target": "ready",
+            "actions": {
+              "type": "selectOrCreateCircle"
+            }
+          },
           "confirm": {
             "target": "ready"
           },
@@ -198,7 +211,6 @@ export const circlesMachine = setup({
             "actions": {
               "type": "changeRadius"
             },
-            "description": "params: newRadius: number"
           }
         }
       }
