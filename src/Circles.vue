@@ -40,7 +40,7 @@ const handleClick = (e: MouseEvent) => {
         <input @input="(e: Event) => {
           const target = e.target as HTMLInputElement
           send({ type: 'changeRadius', newRadius: Number(target.value) })
-        }" type="range" id="radius-slider" name="radius-slider" min="1" max="1000"
+        }" type="range" id="radius-slider" name="radius-slider" min="1" max="400"
           :value="circles[snapshot.context.indexOfSelectedCircle]?.radius || 0" step="1"
           :disabled="snapshot.context.indexOfSelectedCircle === -1" />
       </div>
