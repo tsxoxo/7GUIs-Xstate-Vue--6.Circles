@@ -59,6 +59,11 @@ export const circlesMachine = setup({
       context.indexOfSelectedCircle > -1
   },
   "actions": {
+    "deselectCircle": assign(() => {
+      return {
+        indexOfSelectedCircle: -1
+      }
+    }),
     "selectOrCreateCircle": assign(({ context, event }) => {
       assertEvent(event, 'leftClickOnCanvas');
 
@@ -137,7 +142,7 @@ export const circlesMachine = setup({
       assertEvent(event, 'changeRadius');
 
       const changesToContext: Partial<typeof context> = {}
-      const currentStateCopy: State = context.states[context.stateHistory[context.currentPosInStateHistory]].slice()
+      const currentStateCopy: State = structuredClone(context.states[context.stateHistory[context.currentPosInStateHistory]])
 
       currentStateCopy[context.indexOfSelectedCircle].radius = event.newRadius
       changesToContext.states = context.states.toSpliced(context.stateHistory[context.currentPosInStateHistory], 1, currentStateCopy)
@@ -198,13 +203,21 @@ export const circlesMachine = setup({
             }
           },
           "confirm": {
-            "target": "ready"
+            "target": "ready",
+            'actions': {
+              "type": "deselectCircle"
+            }
           },
           "cancel": {
             "target": "ready",
-            "actions": {
-              "type": "removeTempState"
-            }
+            "actions": [
+              {
+                "type": "removeTempState"
+              },
+              {
+                "type": "deselectCircle"
+              }
+            ]
           },
           "changeRadius": {
             "target": "changingCircle",
